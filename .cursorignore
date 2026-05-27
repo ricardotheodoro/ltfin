@@ -1,0 +1,73 @@
+# =====================================================================
+# .cursorignore — arquivos que o Cursor NUNCA deve indexar nem ler
+# =====================================================================
+# Use este arquivo para excluir totalmente conteúdo do contexto do agente
+# (busca semântica, @file e leituras automáticas).
+# Para apenas tirar da indexação mas permitir leitura manual,
+# use .cursorindexingignore.
+
+# ----- Dependências -----
+/vendor/
+/node_modules/
+
+# ----- Build / assets compilados do Metronic -----
+# São arquivos imensos e gerados; poluem a busca semântica.
+/public/assets/
+/public/css/
+/public/js/
+/public/media/
+/public/plugins/
+/public/demo1/
+/public/demo2/
+/public/demo3/
+/public/demo4/
+/public/demo5/
+/public/demo6/
+/public/demo7/
+/public/hot
+/public/storage
+/public/mix-manifest.json
+
+# ----- Tema KeenThemes "cru" (fonte do tema vendido) -----
+/resources/_keenthemes/
+
+# ----- Storage gerado em runtime -----
+/storage/framework/
+/storage/logs/
+/storage/app/public/
+/storage/*.key
+
+# ----- Cache do Laravel -----
+/bootstrap/cache/*.php
+
+# ----- Arquivos gerados pelo IDE Helper -----
+_ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php
+
+# ----- Lockfiles (grandes, raramente úteis em chat) -----
+composer.lock
+package-lock.json
+yarn.lock
+
+# ----- Minificados e mapas -----
+*.min.js
+*.min.css
+*.map
+
+# ----- Logs e caches diversos -----
+*.log
+.phpunit.result.cache
+npm-debug.log
+yarn-error.log
+
+# ----- Segredos / ambiente -----
+.env
+.env.backup
+.env.*.local
+
+# ----- SO / editor -----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

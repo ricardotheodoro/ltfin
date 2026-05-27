@@ -1,0 +1,81 @@
+---
+description: Convenções para assets do frontend (SASS, JS custom) — Laravel Mix + tema Metronic
+globs:
+  - "resources/sass/**/*.scss"
+  - "resources/js/**/*.js"
+  - "webpack.mix.js"
+alwaysApply: false
+---
+
+# Convenções de frontend (SASS/JS) — LTFin
+
+O bundler é o **Laravel Mix (Webpack 5)** configurado em `webpack.mix.js`.
+O tema Metronic é fornecido pronto em `resources/_keenthemes/` e
+publicado em `public/`. **Não edite** o tema vendido.
+
+## Onde escrever código próprio
+
+- **SASS custom:** `resources/sass/` (organize por feature ou demo).
+- **JS custom:** `resources/js/` (organize por feature).
+- **Assets compartilhados:** `public/assets/` é gerado — não editar manualmente.
+
+## Build
+
+```bash
+npm run dev          # build dev (modo development)
+npm run watch        # rebuild em mudança
+npm run hot          # HMR
+npm run prod         # build de produção
+make production      # produção para todas as demos (demo1..demo7)
+```
+
+Após editar SASS/JS, **sempre** rodar `npm run dev` antes de testar no browser.
+
+## SASS
+
+- Indentação de **4 espaços** (consistente com `.editorconfig`).
+- Use **variáveis do Bootstrap 5** e do Metronic quando existirem
+  (evita drift visual). Override em arquivo próprio, importado por último.
+- Aninhamento máximo de **3 níveis** — se passar, refatorar.
+- Nomes de classes: kebab-case (`.user-card-header`).
+- Não duplicar utilitários já presentes no Bootstrap/Metronic
+  (`.text-muted`, `.fw-bold`, `.fs-2`, etc.).
+
+## JS
+
+- ES6+ (transpilado pelo Mix/Babel).
+- **Evitar** poluir o escopo global. Use módulos/IIFEs.
+- jQuery 3.6 está disponível (tema depende), mas em código novo,
+  prefira **vanilla JS** quando trivial.
+- Não substituir libs do tema (Apex Charts, FullCalendar, Select2, etc.)
+  sem alinhamento — elas têm inicialização específica do Metronic.
+- Para AJAX, use `axios` (já listado em `package.json`) com CSRF token
+  configurado, ou `fetch` com `X-CSRF-TOKEN`.
+
+## webpack.mix.js
+
+- **Não** remover as variações de demo (`demo1..demo7`) sem necessidade.
+- Para registrar um novo arquivo SASS/JS custom, adicione uma linha
+  `mix.sass(...)` / `mix.js(...)` próxima às existentes.
+- Após mudar `webpack.mix.js`, rodar `npm run dev` novamente.
+
+## Plugins do Metronic
+
+- Inicialização global em `resources/_keenthemes/` (publicada para `public/`).
+- Para inicializar plugins por página, use `@push('scripts')` no Blade,
+  apontando para arquivos em `public/js/custom/` ou `resources/js/`.
+
+## O que **NÃO** editar
+
+- `public/assets/`, `public/css/`, `public/js/`, `public/media/`,
+  `public/plugins/`, `public/demoX/` — todos gerados.
+- `resources/_keenthemes/` — fonte do tema KeenThemes (licenciado).
+- `node_modules/`.
+
+## Performance
+
+- Imagens: usar formatos modernos (`.webp`) quando possível e
+  servir tamanho adequado. Lazy-load via `loading="lazy"` em `<img>`.
+- Bundles: evitar importar libs inteiras quando só usa um módulo
+  (`import debounce from 'lodash/debounce'` em vez de `lodash`).
+- Em produção, `npm run prod` já minifica e gera hashes.

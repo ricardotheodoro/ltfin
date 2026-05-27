@@ -1,0 +1,103 @@
+---
+description: Convenções para views Blade do tema Metronic 8 (layouts, partials, componentes, datatables)
+globs:
+  - "resources/views/**/*.blade.php"
+alwaysApply: false
+---
+
+# Convenções de views Blade — LTFin (Metronic 8)
+
+Aplicar ao criar/editar qualquer template em `resources/views/`.
+
+## Hierarquia de layouts
+
+- `resources/views/base/base.blade.php` — layout raiz (HTML, head, assets).
+- `resources/views/layout/` — layouts compostos (header, footer, aside, etc.).
+- Componentes Blade em `app/View/Components/`:
+  - `BaseLayout` → `<x-base-layout>` para páginas autenticadas.
+  - `AuthLayout` → `<x-auth-layout>` para telas de auth.
+
+Páginas reais herdam destes layouts via `<x-base-layout>` ou `@extends('base.base')`.
+
+```blade
+<x-base-layout>
+    @section('content')
+        {{-- conteúdo da página --}}
+    @endsection
+</x-base-layout>
+```
+
+## Partials
+
+- Ficam em `resources/views/partials/` e começam com underscore: `_widget-1.blade.php`.
+- Incluir com `@include('partials.widgets.tables._widget-10')`.
+- Partials são apenas pedaços de markup; **sem lógica de negócio**.
+- Passar dados via `@include('partial', ['data' => $data])`.
+
+## Stacks de assets
+
+- **Nunca** colocar `<script>` ou `<style>` grande inline.
+- Para JS por página:
+
+  ```blade
+  @push('scripts')
+      <script src="{{ asset('js/custom/widgets.js') }}"></script>
+  @endpush
+  ```
+
+- Stacks disponíveis no `base.blade.php`:
+  - `@stack('styles')` — CSS específico da página.
+  - `@stack('scripts')` — JS específico da página.
+  - `@stack('vendors')` — libs vendor adicionais.
+
+## Datatables (Yajra)
+
+- Tabelas server-side usando `yajra/laravel-datatables-*`.
+- Partials de referência em `resources/views/partials/widgets/tables/_widget-*.blade.php`.
+- Inicialização no controller via `DataTables::of($query)->toJson()`,
+  ou via Builder com `Html::factory()` quando server-side completo.
+- Sempre passar `$dataTable->render('partials.widgets.tables._widget-X')`
+  ou template equivalente.
+
+## Tradução e escape
+
+- Strings de UI: `{{ __('users.title') }}` — arquivos em `resources/lang/en/`.
+- **Sempre** escapar input do usuário com `{{ $var }}`.
+- `{!! !!}` só para conteúdo confiável (markdown renderizado, HTML
+  controlado pela aplicação). Quando em dúvida, sanitizar antes.
+
+## Componentes do Metronic
+
+- Botões, badges, cards, modais seguem classes do Bootstrap 5 + utilitários
+  do Metronic (`btn-light-primary`, `card-bordered`, `symbol`, `menu-link`,
+  `data-kt-menu-trigger`, etc.).
+- Ícones: usar **KeenIcons** (`<i class="ki-duotone ki-user fs-2"></i>`) ou
+  Bootstrap Icons / FontAwesome conforme o tema da página.
+- Menus laterais: definidos em `config/demoN/menu.php`, renderizados pelos
+  partials de aside.
+
+## Formulários
+
+- Sempre `@csrf` em `<form method="POST">`.
+- Action: `{{ route('nome.rota') }}`.
+- Erros: `@error('campo') <div class="invalid-feedback">{{ $message }}</div> @enderror`.
+- `old('campo', $model->campo ?? '')` para repopular.
+- Classes do tema:
+  - `form-control form-control-solid` para inputs.
+  - `form-select form-select-solid` para selects.
+  - `btn btn-primary` para submit.
+
+## Acessibilidade
+
+- Sempre usar `<label for="...">` ligado ao `id` do input.
+- Botões e links com texto significativo (sem `<a>` vazio).
+- Atributos `aria-*` em modais, dropdowns e tabs (o tema já os fornece;
+  mantenha ao copiar partials).
+
+## O que evitar
+
+- Lógica complexa em Blade. Mover para view composers, view models ou services.
+- Queries Eloquent diretamente na view. Passar via controller/composer.
+- `<?php ... ?>` puro: prefira diretivas `@php @endphp` quando inevitável.
+- Editar partials originais do tema dentro de `resources/_keenthemes/`.
+- Reabrir o `<head>` ou duplicar `<body>` — usar as `@section` do layout base.

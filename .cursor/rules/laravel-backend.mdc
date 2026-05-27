@@ -1,0 +1,129 @@
+---
+description: Convenções de backend Laravel (controllers, models, requests, services) para o projeto LTFin
+globs:
+  - "app/**/*.php"
+  - "routes/**/*.php"
+  - "database/**/*.php"
+  - "config/**/*.php"
+alwaysApply: false
+---
+
+# Convenções de backend Laravel — LTFin
+
+Este projeto usa **Laravel 8** com o tema **Metronic 8**. Siga as convenções
+abaixo ao criar ou alterar código PHP nas pastas `app/`, `routes/`,
+`database/` e `config/`.
+
+## Princípios gerais
+
+- **PSR-12** + preset Laravel do StyleCI. Indentação de **4 espaços**.
+- **Imutabilidade e funções puras** sempre que possível: services e
+  actions devem evitar estado mutável compartilhado.
+- **Tipagem forte**: declare tipos de parâmetros e retornos em todos
+  os métodos públicos. Nunca use `mixed` quando puder ser específico.
+- **Composição sobre herança**. Prefira **Services / Actions** injetados
+  via construtor a herdar de classes base custom.
+- Nomes descritivos: `isUserActive`, `fetchActiveUsers()`, `assertHasPermission()`.
+
+## Controllers
+
+- Devem ser **finos**: receber request, delegar para Service/Action,
+  retornar response/view.
+- Nunca colocar regra de negócio diretamente no controller.
+- Validação **sempre via FormRequest** (`app/Http/Requests/...`).
+  Nunca chamar `$request->validate(...)` inline.
+- Plural no nome: `UsersController`, `OrdersController`.
+- Para CRUD, manter os 7 métodos REST padrão (`index`, `create`,
+  `store`, `show`, `edit`, `update`, `destroy`) com type-hints corretos.
+- Sempre tipar o retorno: `View`, `RedirectResponse`, `JsonResponse`,
+  `Response`, etc.
+
+```php
+public function store(StoreUserRequest $request): RedirectResponse
+{
+    $user = $this->users->create($request->validated());
+
+    return redirect()->route('users.show', $user)
+        ->with('success', __('users.created'));
+}
+```
+
+## FormRequests
+
+- Um por ação que recebe dados (`StoreUserRequest`, `UpdateUserRequest`).
+- `authorize()` deve refletir a permissão real (use Spatie):
+  `return $this->user()->can('users.create');`.
+- Mensagens custom em `messages()`, atributos em `attributes()`.
+- Para regras complexas/reutilizáveis, criar `Rule` em `app/Rules/`
+  (ver exemplo: `MatchOldPassword`).
+
+## Models (Eloquent)
+
+- Singular: `User`, `UserInfo`.
+- Sempre declarar `$fillable` ou `$guarded` (preferir `$fillable`).
+- Declarar `$casts` para tipos não-string (datetime, json, bool, int).
+- **Relacionamentos** retornam o tipo do relationship
+  (`HasMany`, `BelongsTo`, ...).
+- **Scopes** para queries reutilizáveis: `scopeActive`, `scopeByRole`.
+- Acessores/mutators usando a sintaxe nova quando possível
+  (`protected function name(): Attribute`).
+
+## Migrations
+
+- Nome `YYYY_MM_DD_HHMMSS_acao_em_snake_case.php`.
+- **NUNCA** editar migration já aplicada em produção — crie nova.
+- Use `foreignId()->constrained()` em vez de `foreign()/references()/on()`.
+- Sempre prover `down()` reversível.
+- Para alterações em tabelas Spatie/anlutro, usar nomes/colunas exatamente
+  como definidos pelos pacotes (ver migrations existentes).
+
+## Permissões e auditoria
+
+- **RBAC**: `spatie/laravel-permission`.
+  - Middleware: `->middleware('permission:users.view')`.
+  - Programático: `$user->can('users.edit')` ou `$user->hasRole('admin')`.
+  - Seeds: `RolesSeeder` e `PermissionsSeeder` rodam antes de `UsersSeeder`
+    em `DatabaseSeeder`.
+- **Activity log**: `spatie/laravel-activitylog` v4.
+  - Models auditáveis: `use LogsActivity;` + propriedade `$logAttributes`
+    ou método `getActivitylogOptions()`.
+  - Eventos custom: `activity()->log('event_name');`.
+
+## Settings da aplicação
+
+- Use `anlutro/l4-settings`. Store ativa = **database** (`config/settings.php`).
+- Leitura: `Settings::get('chave', 'default')`.
+- Escrita: `Settings::set('chave', $valor); Settings::save();`.
+- Não criar tabelas paralelas para configuração geral — usar settings.
+
+## Tema (config/demoN/)
+
+- Cada demo tem `general.php`, `menu.php`, `pages.php` em `config/demoN/`.
+- A demo ativa é a setting `demo` (default `demo1`).
+- Para adicionar uma página ao menu, editar `menu.php` da(s) demo(s)
+  relevantes; mapear em `pages.php`.
+- Helper global: `theme()->getOption('page')` (definido em `app/helpers.php`).
+
+## Routes
+
+- `routes/web.php` — rotas com sessão/CSRF.
+- `routes/api.php` — rotas stateless (prefixo `/api`, throttle).
+- `routes/auth.php` — rotas de autenticação (Breeze).
+- Nomear todas as rotas: `->name('users.index')`.
+- Agrupar por middleware/prefix/name quando fizer sentido.
+- Resource routes: `Route::resource('users', UsersController::class);`.
+
+## Tratamento de erros
+
+- Exceções específicas em `app/Exceptions/` quando útil.
+- Em controllers/actions, **não** capturar `\Exception` genérico
+  sem rethrow ou log estruturado.
+- Para APIs, retornar JSON com `status`, `message`, `errors` consistentes.
+
+## O que evitar
+
+- `DB::raw(...)` quando Eloquent resolve.
+- Lógica de negócio em FormRequests, Models ou Blade.
+- `env()` fora de arquivos de `config/` (quebra `php artisan config:cache`).
+- Editar arquivos do tema vendido (`resources/_keenthemes/`, `public/assets/`).
+- Strings hard-coded de UI: use `__('arquivo.chave')` (`resources/lang/`).

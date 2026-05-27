@@ -1,0 +1,110 @@
+---
+description: Convenções de testes (PHPUnit) — Arrange-Act-Assert, factories, RefreshDatabase
+globs:
+  - "tests/**/*.php"
+  - "phpunit.xml"
+alwaysApply: false
+---
+
+# Convenções de teste — LTFin
+
+O projeto usa **PHPUnit 9** (não Pest). Suítes `Unit/` e `Feature/`
+definidas em `phpunit.xml`.
+
+## Estrutura geral
+
+- **Unit tests** em `tests/Unit/` — testam classes isoladas, sem
+  bootstrap completo do Laravel quando possível.
+- **Feature tests** em `tests/Feature/` — testam fluxos HTTP/console,
+  com app real (DB, sessão, auth).
+- Nome do arquivo: `<Classe>Test.php` ou `<Comportamento>Test.php`.
+- Nome do método: `it_does_something()` **ou** `test_does_something()`.
+
+## Padrão Arrange-Act-Assert
+
+```php
+public function test_authenticated_user_can_view_users_index(): void
+{
+    // Arrange
+    $user = User::factory()->create();
+    $user->givePermissionTo('users.view');
+
+    // Act
+    $response = $this->actingAs($user)->get(route('users.index'));
+
+    // Assert
+    $response->assertOk();
+    $response->assertViewIs('pages.users.index');
+}
+```
+
+Sempre **separar visualmente** com comentários `// Arrange` / `// Act` / `// Assert`
+quando o teste tem mais de poucas linhas.
+
+## Banco de dados
+
+- **Sempre** usar `use RefreshDatabase;` em testes que tocam o DB.
+- **Nunca** assumir dados de seed em Feature tests — cada teste
+  monta seus próprios dados via factory.
+- Usar `User::factory()->create([...])` em vez de inserir via Eloquent direto.
+- Para roles/permissões, criar via Spatie no setup:
+
+  ```php
+  protected function setUp(): void
+  {
+      parent::setUp();
+      Role::create(['name' => 'admin']);
+      Permission::create(['name' => 'users.view']);
+  }
+  ```
+
+## Auth
+
+- `$this->actingAs($user)` para autenticar.
+- `$this->actingAs($user, 'api')` para guard específico.
+- `$this->postJson('/api/...')` para APIs (afeta `Accept: application/json`).
+- Validar redirect de login com `$response->assertRedirect(route('login'));`.
+
+## Asserções úteis
+
+- HTTP: `assertOk`, `assertStatus`, `assertRedirect`, `assertSessionHas`,
+  `assertSessionHasErrors`.
+- View: `assertViewIs`, `assertViewHas`, `assertSee`, `assertDontSee`.
+- DB: `assertDatabaseHas`, `assertDatabaseMissing`, `assertDatabaseCount`.
+- JSON: `assertJson`, `assertJsonStructure`, `assertJsonPath`.
+
+## Activity log e settings nos testes
+
+- `activitylog` pode ser desligado por teste com `config(['activitylog.enabled' => false]);`
+  quando o registro polui as asserções.
+- Para `anlutro/l4-settings`, setar via `Settings::set(...)` no setup e
+  **não** depender da setting `demo` para testes (deve funcionar com qualquer demo).
+
+## Mocks
+
+- Preferir **fakes** do Laravel (`Mail::fake()`, `Queue::fake()`,
+  `Event::fake()`, `Storage::fake()`) a mocks manuais.
+- Para HTTP externo: `Http::fake([...]);`.
+- Mockery só quando não houver fake disponível.
+
+## Performance e isolamento
+
+- Cada teste deve poder rodar **em qualquer ordem** sem flakiness.
+- Não compartilhar estado via propriedades estáticas.
+- Não depender da hora do sistema sem `Carbon::setTestNow(...)`.
+
+## Comandos
+
+```bash
+php artisan test                           # roda toda a suíte
+php artisan test --filter=UsersTest        # filtra por classe/método
+php artisan test --parallel                # paralelo (verifique DB de teste)
+vendor/bin/phpunit --testsuite=Feature     # só Feature
+```
+
+## O que evitar
+
+- Asserções genéricas (`assertTrue(true)`).
+- Testes que dependem de `php artisan migrate:fresh --seed` ter rodado.
+- Testes que fazem chamadas HTTP reais (use `Http::fake`).
+- Tempo real: sempre congelar com `Carbon::setTestNow()`.
