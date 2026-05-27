@@ -1,83 +1,78 @@
-# Metronic - Bootstrap 5 HTML, React, Angular, VueJS & Laravel Admin Dashboard Theme
+# LTFin
 
-- For a quick start please check [Online documentation page](//preview.keenthemes.com/metronic8/laravel/documentation/getting-started/build)
+Aplicação administrativa para controle financeiro mensal, baseada em Laravel + Metronic.
 
+## Instalação do sistema
 
-- The offline documentation is available within the theme [Offline documentation page](//localhost:8000/documentation/getting-started/build)
+### 1) Pré-requisitos
 
+- PHP 7.4+ (recomendado PHP 8.x)
+- Composer
+- Node.js e NPM
+- MySQL
 
-- For any theme related questions please contact our [Theme Support](//keenthemes.com/support/)
+### 2) Instalar dependências
 
+```bash
+composer install
+npm install
+```
 
-- Using Metronic in a new project or for a new client? Purchase a new license https://1.envato.market/EA4JP or watch https://youtu.be/HJ3RNhoI24A to find out more information about licenses.
+### 3) Configurar ambiente
 
+```bash
+cp .env.example .env
+```
 
-- Stay tuned for updates via [Twitter](//www.twitter.com/keenthemes) and [Instagram](//www.instagram.com/keenthemes) and 
-  check our marketplace for more amazing products: [Keenthemes Marketplace](//keenthemes.com/)
+No Windows (Prompt), use:
 
+```bash
+copy .env.example .env
+```
 
-Happy coding with Metronic!
+Depois, ajuste as variáveis de banco no arquivo `.env`:
 
+- `DB_HOST`
+- `DB_PORT`
+- `DB_DATABASE`
+- `DB_USERNAME`
+- `DB_PASSWORD`
 
+### 4) Gerar chave da aplicação
 
-### Laravel Quick Start
+```bash
+php artisan key:generate
+```
 
-1. Download the latest theme source from the Marketplace.
+### 5) Criar estrutura do banco e dados iniciais
 
+```bash
+php artisan migrate:fresh --seed
+```
 
-2. Download and install `Node.js` from Nodejs. The suggested version to install is `14.16.x LTS`.
+### 6) Compilar assets front-end
 
+```bash
+npm run dev
+```
 
-3. Start a command prompt window or terminal and change directory to [unpacked path]:
+### 7) Subir a aplicação
 
+```bash
+php artisan serve
+```
 
-4. Install the latest `NPM`:
-   
-        npm install --global npm@latest
+Acesse no navegador: `http://localhost:8000`
 
+## Uso das telas principais
 
-5. To install `Composer` globally, download the installer from https://getcomposer.org/download/ Verify that Composer in successfully installed, and version of installed Composer will appear:
-   
-        composer --version
+Após login, utilize o menu lateral para navegar nas telas abaixo:
 
-
-6. Install `Composer` dependencies.
-   
-        composer install
-
-
-7. Install `NPM` dependencies.
-   
-        npm install
-
-
-8. The below command will compile all the assets(sass, js, media) to public folder:
-   
-        npm run dev
-
-
-9. Copy `.env.example` file and create duplicate. Use `cp` command for Linux or Max user.
-
-        cp .env.example .env
-
-    If you are using `Windows`, use `copy` instead of `cp`.
-   
-        copy .env.example .env
-   
-
-10. Create a table in MySQL database and fill the database details `DB_DATABASE` in `.env` file.
-
-
-12. The below command will create tables into database using Laravel migration and seeder.
-
-        php artisan migrate:fresh --seed
-
-
-13. Generate your application encryption key:
-
-        php artisan key:generate
-
-
-14. Start the localhost server:
-    
-        php artisan serve
+- **Dashboard** (`/index`): visão geral com indicadores principais.
+- **Lançamentos Mensais** (`/monthly-periods`): cadastro e consulta dos lançamentos do mês.
+- **Previsão Mensal** (`/monthly-forecasts`): planejamento e acompanhamento das previsões.
+- **Relatórios > Gastos x Previsão Mensal** (`/reports/expenses-vs-forecast`): comparação entre realizado e previsto.
+- **Cadastros > Categorias de Gastos** (`/expense-categories`): manutenção das categorias de despesas.
+- **Cadastros > Categorias de Recebimento** (`/income-categories`): manutenção das categorias de receitas.
+- **Minha Conta > Visão Geral** (`/account/overview`): dados de perfil do usuário logado.
+- **Minha Conta > Configurações** (`/account/settings`): atualização de informações da conta e preferências.
