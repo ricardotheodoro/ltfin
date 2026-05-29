@@ -68,7 +68,7 @@ jobs:
         run: npm ci
 
       - name: Build frontend assets (demo1)
-        run: npm run prod -- --demo1
+        run: npm run prod --demo1
 
       - name: Cache Laravel for production
         run: |
