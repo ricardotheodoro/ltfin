@@ -1,16 +1,20 @@
 <!--begin::Topbar-->
 <div class="d-flex align-items-center flex-shrink-0">
-    {{ theme()->getView('layout/search/_base') }}
+    @if (theme()->getOption('layout', 'toolbar/search', false))
+        {{ theme()->getView('layout/search/_base') }}
+    @endif
 
-    <!--begin::Activities-->
-    <div class="d-flex align-items-center ms-3 ms-lg-4">
-        <!--begin::Drawer toggle-->
-        <div class="btn btn-icon btn-color-gray-700 btn-active-color-primary  btn-outline btn-outline-secondary w-40px h-40px" id="kt_activities_toggle">
-            {!! theme()->getSvgIcon("icons/duotune/general/gen007.svg", "svg-icon-1") !!}
+    @if (theme()->getOption('layout', 'toolbar/activity_logs', false))
+        <!--begin::Activities-->
+        <div class="d-flex align-items-center ms-3 ms-lg-4">
+            <!--begin::Drawer toggle-->
+            <div class="btn btn-icon btn-color-gray-700 btn-active-color-primary  btn-outline btn-outline-secondary w-40px h-40px" id="kt_activities_toggle">
+                {!! theme()->getSvgIcon("icons/duotune/general/gen007.svg", "svg-icon-1") !!}
+            </div>
+            <!--end::Drawer toggle-->
         </div>
-        <!--end::Drawer toggle-->
-    </div>
-    <!--end::Activities-->
+        <!--end::Activities-->
+    @endif
 
     <!--begin::Chat-->
     <div class="d-flex d-none align-items-center ms-3 ms-lg-4">

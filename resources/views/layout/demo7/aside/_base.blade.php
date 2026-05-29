@@ -49,42 +49,46 @@
 			</div>
 			<!--end::Quick links-->
 
-			<!--begin::Notifications-->
-			<div class="d-flex align-items-center mb-2">
-				<!--begin::Menu wrapper-->
-				<div class="btn btn-icon btn-active-color-primary btn-color-gray-400 btn-active-light"
+			@if (theme()->getOption('layout', 'toolbar/notifications', false))
+				<!--begin::Notifications-->
+				<div class="d-flex align-items-center mb-2">
+					<!--begin::Menu wrapper-->
+					<div class="btn btn-icon btn-active-color-primary btn-color-gray-400 btn-active-light"
+						data-kt-menu-trigger="click"
+						data-kt-menu-overflow="true"
+						data-kt-menu-placement="top-start"
+						data-bs-toggle="tooltip"
+						data-bs-placement="right"
+						data-bs-dismiss="click"
+						title="Notifications">
+						{!! theme()->getSvgIcon("icons/duotune/general/gen025.svg", "svg-icon-2 svg-icon-lg-1") !!}
+					</div>
+
+					{{ theme()->getView('partials/topbar/_notifications-menu', array('notifications-bg' => 'misc/dropdown-header-bg.png')) }}
+					<!--end::Menu wrapper-->
+				</div>
+				<!--end::Notifications-->
+			@endif
+
+			@if (theme()->getOption('layout', 'toolbar/activity_logs', false))
+				<!--begin::Activities-->
+				<div class="d-flex align-items-center mb-3">
+					<!--begin::Drawer toggle-->
+					<div class="btn btn-icon btn-active-color-primary btn-color-gray-400 btn-active-light"
 					data-kt-menu-trigger="click"
 					data-kt-menu-overflow="true"
 					data-kt-menu-placement="top-start"
 					data-bs-toggle="tooltip"
 					data-bs-placement="right"
 					data-bs-dismiss="click"
-					title="Notifications">
-					{!! theme()->getSvgIcon("icons/duotune/general/gen025.svg", "svg-icon-2 svg-icon-lg-1") !!}
+					title="Activity Logs"
+					id="kt_activities_toggle">
+						{!! theme()->getSvgIcon("icons/duotune/general/gen032.svg", "svg-icon-2 svg-icon-lg-1") !!}
+					</div>
+					<!--end::drawer toggle-->
 				</div>
-
-				 {{ theme()->getView('partials/topbar/_notifications-menu', array('notifications-bg' => 'misc/dropdown-header-bg.png')) }}
-				<!--end::Menu wrapper-->
-			</div>
-			<!--end::Notifications-->
-
-			<!--begin::Activities-->
-			<div class="d-flex align-items-center mb-3">
-				<!--begin::Drawer toggle-->
-				<div class="btn btn-icon btn-active-color-primary btn-color-gray-400 btn-active-light"
-				data-kt-menu-trigger="click"
-				data-kt-menu-overflow="true"
-				data-kt-menu-placement="top-start"
-				data-bs-toggle="tooltip"
-				data-bs-placement="right"
-				data-bs-dismiss="click"
-				title="Activity Logs"
-				id="kt_activities_toggle">
-					{!! theme()->getSvgIcon("icons/duotune/general/gen032.svg", "svg-icon-2 svg-icon-lg-1") !!}
-				</div>
-				<!--end::drawer toggle-->
-			</div>
-			<!--end::Activities-->
+				<!--end::Activities-->
+			@endif
 
 			<!--begin::User-->
 			<div class="d-flex align-items-center mb-10" id="kt_header_user_menu_toggle">

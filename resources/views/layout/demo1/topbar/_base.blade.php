@@ -7,35 +7,41 @@
 
 {{--begin::Toolbar wrapper--}}
 <div class="d-flex align-items-stretch flex-shrink-0">
-    {{--begin::Search--}}
-    <div class="d-flex align-items-stretch {{ $toolbarButtonMarginClass }}">
-        {{ theme()->getView('partials/search/_base') }}
-    </div>
-    {{--end::Search--}}
-
-    {{--begin::Activities--}}
-    <div class="d-flex align-items-center {{ $toolbarButtonMarginClass }}">
-        {{--begin::drawer toggle--}}
-        <div class="btn btn-icon btn-active-light-primary {{ $toolbarButtonHeightClass }}" id="kt_activities_toggle">
-            {!! theme()->getSvgIcon("icons/duotune/general/gen032.svg", $toolbarButtonIconSizeClass) !!}
+    @if (theme()->getOption('layout', 'toolbar/search', false))
+        {{--begin::Search--}}
+        <div class="d-flex align-items-stretch {{ $toolbarButtonMarginClass }}">
+            {{ theme()->getView('partials/search/_base') }}
         </div>
-        {{--end::drawer toggle--}}
-    </div>
-    {{--end::Activities--}}
+        {{--end::Search--}}
+    @endif
 
-    {{--begin::Notifications--}}
-    <div class="d-flex align-items-center {{ $toolbarButtonMarginClass }}">
-        {{--begin::Menu--}}
-        <div class="btn btn-icon btn-active-light-primary position-relative {{ $toolbarButtonHeightClass }}" data-kt-menu-trigger="click" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
-            {!! theme()->getSvgIcon("icons/duotune/communication/com012.svg", $toolbarButtonIconSizeClass) !!}
-
-            <span class="bullet bullet-dot bg-success h-6px w-6px position-absolute translate-middle top-0 start-50 animation-blink">
-            </span>
+    @if (theme()->getOption('layout', 'toolbar/activity_logs', false))
+        {{--begin::Activities--}}
+        <div class="d-flex align-items-center {{ $toolbarButtonMarginClass }}">
+            {{--begin::drawer toggle--}}
+            <div class="btn btn-icon btn-active-light-primary {{ $toolbarButtonHeightClass }}" id="kt_activities_toggle">
+                {!! theme()->getSvgIcon("icons/duotune/general/gen032.svg", $toolbarButtonIconSizeClass) !!}
+            </div>
+            {{--end::drawer toggle--}}
         </div>
-        {{ theme()->getView('partials/topbar/_notifications-menu') }}
-        {{--end::Menu--}}
-    </div>
-    {{--end::Notifications--}}
+        {{--end::Activities--}}
+    @endif
+
+    @if (theme()->getOption('layout', 'toolbar/notifications', false))
+        {{--begin::Notifications--}}
+        <div class="d-flex align-items-center {{ $toolbarButtonMarginClass }}">
+            {{--begin::Menu--}}
+            <div class="btn btn-icon btn-active-light-primary position-relative {{ $toolbarButtonHeightClass }}" data-kt-menu-trigger="click" data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
+                {!! theme()->getSvgIcon("icons/duotune/communication/com012.svg", $toolbarButtonIconSizeClass) !!}
+
+                <span class="bullet bullet-dot bg-success h-6px w-6px position-absolute translate-middle top-0 start-50 animation-blink">
+                </span>
+            </div>
+            {{ theme()->getView('partials/topbar/_notifications-menu') }}
+            {{--end::Menu--}}
+        </div>
+        {{--end::Notifications--}}
+    @endif
 
     {{--begin::Quick links--}}
     <div class="d-flex align-items-center {{ $toolbarButtonMarginClass }}">

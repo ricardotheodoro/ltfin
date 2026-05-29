@@ -25,7 +25,9 @@
             {!! theme()->getSvgIcon("icons/duotune/communication/com012.svg", "svg-icon-2") !!}
             <span class="pulse-ring"></span>
         </div>
-         {{ theme()->getView('partials/topbar/_notifications-menu', array('notifications-bg' => 'misc/pattern-5.png')) }}
+        @if (theme()->getOption('layout', 'toolbar/notifications', false))
+            {{ theme()->getView('partials/topbar/_notifications-menu', array('notifications-bg' => 'misc/pattern-5.png')) }}
+        @endif
         <!--end::Menu wrapper-->
     </div>
     <!--end::Chat-->

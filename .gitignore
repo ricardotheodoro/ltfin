@@ -28,3 +28,6 @@ yarn-error.log
 _ide_helper.php
 _ide_helper_models.php
 .phpstorm.meta.php
+
+# Estado incremental do FTP-Deploy-Action (gerado no CI; opcional commitar)
+.ftp-deploy-sync-state.json

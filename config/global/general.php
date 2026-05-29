@@ -143,6 +143,19 @@ return array(
         'illustrations' => array(
             'set' => 'sketchy-1',
         ),
+
+        // Aside menu
+        'aside'         => array(
+            'documentation' => false,
+        ),
+
+        // Toolbar (topbar)
+        'toolbar'       => array(
+            'notifications'  => false,
+            'search'           => false,
+            'activity_logs'    => false,
+            'explore'          => false,
+        ),
     ),
 
 );
