@@ -1,0 +1,109 @@
+# Deploy LTFin para FTP (hospedagem compartilhada).
+#
+# Configure em GitHub → Settings → Secrets and variables → Actions:
+#   FTP_SERVER      — ex.: ricardotheodoro.com.br
+#   FTP_USERNAME    — ex.: usuario@ricardotheodoro.com.br
+#   FTP_PASSWORD    — senha FTP (nunca commitar)
+#   FTP_SERVER_DIR  — pasta remota, ex.: /public_html/ ou /ltfin/
+#
+# No servidor: .env, APP_KEY, permissões em storage/ e bootstrap/cache/,
+# e migrations via terminal/cPanel (FTP não executa artisan migrate).
+
+name: Deploy via FTP
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ftp-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mbstring, xml, ctype, json, tokenizer, pdo_mysql, fileinfo, bcmath
+          coverage: none
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install PHP dependencies
+        run: composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: npm
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Build frontend assets (demo1)
+        run: npm run prod -- --demo1
+
+      - name: Cache Laravel for production
+        run: |
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+        env:
+          APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+          APP_ENV: production
+          APP_DEBUG: 'false'
+
+      - name: Deploy to FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          local-dir: ./
+          log-level: minimal
+          exclude: |
+            **/.git*
+            **/.github/**
+            **/node_modules/**
+            **/tests/**
+            **/.env
+            **/.env.*
+            **/resources/_keenthemes/**
+            **/.cursor/**
+            **/phpunit.xml
+            **/.phpunit.result.cache
+            **/docker-compose*.yml
+            **/Homestead.*
+            **/Makefile
+            **/webpack.mix.js
+            **/package.json
+            **/package-lock.json
+            **/composer.json
+            **/composer.lock
+            **/_ide_helper.php
+            **/_ide_helper_models.php
+            **/.phpstorm.meta.php
+            **/AGENTS.md
+            **/.editorconfig
+            **/.styleci.yml
