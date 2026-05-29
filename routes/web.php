@@ -3,7 +3,6 @@
 use App\Http\Controllers\Account\SettingsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\SocialiteLoginController;
-use App\Http\Controllers\Documentation\ReferencesController;
 use App\Http\Controllers\ExpenseCategoriesController;
 use App\Http\Controllers\IncomeCategoriesController;
 use App\Http\Controllers\MonthlyEntriesController;
@@ -33,15 +32,10 @@ Route::get('/', function () {
 
 Route::middleware('auth')->get('index', [DashboardController::class, 'index'])->name('dashboard');
 
-// Documentations pages
-Route::prefix('documentation')->group(function () {
-    Route::get('getting-started/references', [ReferencesController::class, 'index']);
-    Route::get('getting-started/changelog', [PagesController::class, 'index']);
-});
-
 Route::middleware('auth')->group(function () {
     // Account pages
     Route::prefix('account')->group(function () {
+        Route::get('overview', [PagesController::class, 'index'])->name('account.overview');
         Route::get('settings', [SettingsController::class, 'index'])->name('settings.index');
         Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
         Route::put('settings/email', [SettingsController::class, 'changeEmail'])->name('settings.changeEmail');
@@ -97,9 +91,7 @@ array_walk($menu, function ($val) {
 
     $route = Route::get($val['path'], [PagesController::class, 'index']);
 
-    if (!\Illuminate\Support\Str::contains($val['path'], 'documentation')) {
-        $route->middleware('auth');
-    }
+    $route->middleware('auth');
 });
 
 Route::middleware('auth')->get('monthly-forecasts', [MonthlyForecastsController::class, 'index'])

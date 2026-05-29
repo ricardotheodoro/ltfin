@@ -41,7 +41,7 @@ class AccountSettingsTest extends TestCase
         ]);
 
         // Assert
-        $response->assertRedirect('account/settings');
+        $response->assertRedirect(route('settings.index'));
 
         $this->assertDatabaseHas('users', [
             'id' => $user->id,
@@ -93,7 +93,7 @@ class AccountSettingsTest extends TestCase
         ]);
 
         // Assert
-        $response->assertRedirect('account/settings');
+        $response->assertRedirect(route('settings.index'));
 
         $user->refresh();
         $this->assertNotNull($user->info);
@@ -125,7 +125,7 @@ class AccountSettingsTest extends TestCase
         ]);
 
         // Assert
-        $response->assertRedirect('account/settings');
+        $response->assertRedirect(route('settings.index'));
 
         $user->refresh();
         $this->assertNull($user->info->avatar);

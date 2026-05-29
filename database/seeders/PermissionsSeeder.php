@@ -19,9 +19,10 @@ class PermissionsSeeder extends Seeder
         $data = $this->data();
 
         foreach ($data as $value) {
-            Permission::create([
-                'name' => $value['name'],
-            ]);
+            Permission::query()->firstOrCreate(
+                ['name' => $value['name'], 'guard_name' => 'web'],
+                ['name' => $value['name'], 'guard_name' => 'web']
+            );
         }
     }
 
