@@ -257,11 +257,7 @@ class Theme extends \App\Core\Theme
      */
     public static function getDemo()
     {
-        if (class_exists('request')) {
-            return request()->input('demo', self::$demo);
-        }
-
-        return self::$demo;
+        return self::$demo ?: 'demo1';
     }
 
     /**

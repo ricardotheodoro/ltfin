@@ -203,12 +203,7 @@ function getDemos(pathDemos) {
 }
 
 function getParameters() {
-    var possibleArgs = [
-        'dark_mode', 'rtl'
-    ];
-    for (var i = 0; i <= 13; i++) {
-        possibleArgs.push('demo' + i);
-    }
+    var possibleArgs = ['dark_mode', 'rtl', 'demo1'];
 
     var args = [];
     possibleArgs.forEach(function (key) {

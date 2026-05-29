@@ -32,9 +32,8 @@ class AppServiceProvider extends ServiceProvider
         // Share theme adapter class
         View::share('theme', $theme);
 
-        // Set demo globally
-        $theme->setDemo(request()->input('demo', 'demo1'));
-        // $theme->setDemo('demo2');
+        // Demo fixa — apenas demo1 é utilizada no LTFin
+        $theme->setDemo('demo1');
 
         $theme->initConfig();
 

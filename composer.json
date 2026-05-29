@@ -74,6 +74,12 @@
             "Illuminate\\Foundation\\ComposerScripts::postUpdate",
             "@php artisan ide-helper:generate",
             "@php artisan ide-helper:meta"
+        ],
+        "test": [
+            "@php artisan test"
+        ],
+        "db:restore-dev": [
+            "@php artisan db:restore-dev --force"
         ]
     }
 }
