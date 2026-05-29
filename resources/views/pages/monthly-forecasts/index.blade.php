@@ -99,8 +99,12 @@
                             <tbody class="text-gray-600 fw-bold">
                             @foreach ($forecastByCategory as $index => $item)
                                 @php
-                                    $amount = (float) (old("forecasts.$index.expected_amount") ?? $item->expected_amount);
+                                    $hiddenId = "forecast_amount_{$index}";
+                                    $rawAmount = old("forecasts.$index.expected_amount", $item->expected_amount);
+                                    $amount = (float) $rawAmount;
                                     $share = $totalForecast > 0 ? ($amount / $totalForecast) * 100 : 0;
+                                    $displayAmount = MonthlyPeriod::formatMoney($amount);
+                                    $hasAmountError = $errors->has("forecasts.$index.expected_amount");
                                 @endphp
                                 <tr>
                                     <td>
@@ -108,19 +112,32 @@
                                         {{ $item->category_name }}
                                     </td>
                                     <td class="text-end">
-                                        <div class="forecast-amount-field ms-auto">
-                                            @include('pages.monthly-periods._amount-field', [
-                                                'name'    => "forecasts[$index][expected_amount]",
-                                                'id'      => "forecast_amount_{$index}",
-                                                'value'   => old("forecasts.$index.expected_amount", $item->expected_amount),
-                                                'invalid' => $errors->has("forecasts.$index.expected_amount"),
-                                            ])
-                                            @error("forecasts.$index.expected_amount")
-                                                <div class="invalid-feedback d-block text-start">{{ $message }}</div>
-                                            @enderror
+                                        <div class="d-flex align-items-center justify-content-end gap-2 flex-wrap">
+                                            <span class="fw-bold text-gray-800 forecast-amount-display"
+                                                  data-forecast-display-for="{{ $hiddenId }}">
+                                                {{ $displayAmount }}
+                                            </span>
+                                            <input type="hidden"
+                                                   name="forecasts[{{ $index }}][expected_amount]"
+                                                   id="{{ $hiddenId }}"
+                                                   class="js-forecast-amount"
+                                                   value="{{ is_numeric($rawAmount) ? MonthlyPeriod::formatMoneyInput($rawAmount) : $rawAmount }}">
+                                            <button type="button"
+                                                    class="btn btn-sm {{ $hasAmountError ? 'btn-light-danger' : 'btn-light-primary' }}"
+                                                    title="{{ __('Definir valor previsto') }}"
+                                                    data-edit-forecast
+                                                    data-hidden-id="{{ $hiddenId }}"
+                                                    data-category-name="{{ e($item->category_name) }}"
+                                                    data-amount="{{ number_format($amount, 2, '.', '') }}"
+                                                    @if ($hasAmountError)
+                                                        data-validation-error="{{ $errors->first("forecasts.$index.expected_amount") }}"
+                                                    @endif>
+                                                {!! theme()->getSvgIcon('icons/duotune/art/art005.svg', 'svg-icon-3') !!}
+                                                <span class="d-none d-sm-inline ms-1">{{ __('Definir') }}</span>
+                                            </button>
                                         </div>
                                     </td>
-                                    <td class="text-end forecast-share" data-share-for="forecast_amount_{{ $index }}">
+                                    <td class="text-end forecast-share" data-share-for="{{ $hiddenId }}">
                                         {{ number_format($share, 2, ',', '.') }}%
                                     </td>
                                 </tr>
@@ -136,30 +153,20 @@
                         </button>
                     </div>
                 </form>
+
+                @include('pages.monthly-forecasts._forecast-amount-modal')
             @endif
         </div>
     </div>
 
     @if (!$forecastByCategory->isEmpty())
-        @push('styles')
-            <style>
-                .forecast-amount-field {
-                    max-width: 200px;
-                }
-                .forecast-amount-field .input-group-text {
-                    min-width: 3rem;
-                    justify-content: center;
-                }
-            </style>
-        @endpush
-
         @include('pages.monthly-periods._amount-field-scripts')
 
         @push('scripts')
             <script>
                 document.addEventListener('DOMContentLoaded', function () {
                     const totalCard = document.querySelector('[data-forecast-total]');
-                    const amountInputs = document.querySelectorAll('.js-money-amount');
+                    const amountInputs = document.querySelectorAll('.js-forecast-amount');
 
                     function parseMoneyValue(raw) {
                         if (!raw || String(raw).trim() === '') {
@@ -205,9 +212,8 @@
                         });
                     }
 
-                    amountInputs.forEach((input) => {
-                        input.addEventListener('input', updateShares);
-                    });
+                    document.addEventListener('forecast-amount-changed', updateShares);
+                    updateShares();
                 });
             </script>
         @endpush

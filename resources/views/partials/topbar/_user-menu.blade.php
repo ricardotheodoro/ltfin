@@ -92,18 +92,20 @@
             <div class="separator my-2"></div>
             <!--end::Menu separator-->
 
-            <!--begin::Menu item-->
-            <div class="menu-item px-3">
-                <div class="menu-content px-3">
-                    <label class="form-check form-switch form-check-custom form-check-solid">
-                        <input class="form-check-input w-30px h-20px" type="checkbox" value="1" checked="checked" name="notifications"/>
-                        <span class="form-check-label text-muted fs-7">
-                            {{ __('Notifications') }}
-                        </span>
-                    </label>
+            @if (theme()->getOption('layout', 'toolbar/notifications', false))
+                <!--begin::Menu item-->
+                <div class="menu-item px-3">
+                    <div class="menu-content px-3">
+                        <label class="form-check form-switch form-check-custom form-check-solid">
+                            <input class="form-check-input w-30px h-20px" type="checkbox" value="1" checked="checked" name="notifications"/>
+                            <span class="form-check-label text-muted fs-7">
+                                {{ __('Notifications') }}
+                            </span>
+                        </label>
+                    </div>
                 </div>
-            </div>
-            <!--end::Menu item-->
+                <!--end::Menu item-->
+            @endif
         </div>
         <!--end::Menu sub-->
     </div>

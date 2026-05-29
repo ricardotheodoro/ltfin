@@ -37,8 +37,12 @@
         <!--end::Root-->
 
         <!--begin::Drawers-->
-        {{ theme()->getView('partials/topbar/_activity-drawer', array('drawer-direction' => 'end')) }}
-        {{ theme()->getView('partials/explore/_main') }}
+        @if (theme()->getOption('layout', 'toolbar/activity_logs', false))
+            {{ theme()->getView('partials/topbar/_activity-drawer', array('drawer-direction' => 'end')) }}
+        @endif
+        @if (theme()->getOption('layout', 'toolbar/explore', false))
+            {{ theme()->getView('partials/explore/_main') }}
+        @endif
         <!--end::Drawers-->
 
         @if(theme()->getOption('layout', 'scrolltop/display') === true)
